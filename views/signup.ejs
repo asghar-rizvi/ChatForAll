@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatForAll | Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary: #00cec9;
+            --dark: #1e272e;
+            --darker: #1a2026;
+            --light: #f5f6fa;
+            --gray: #808e9b;
+            --success: #00b894;
+            --danger: #d63031;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Left Side - Globe Animation */
+        .signup-left {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://www.transparenttextures.com/patterns/dark-geometric.png');
+        }
+
+        .globe-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .globe {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle at 30% 30%, var(--primary), var(--darker));
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 
+                0 0 60px rgba(108, 92, 231, 0.3),
+                inset 0 0 100px rgba(0, 0, 0, 0.8);
+            animation: rotate 60s linear infinite;
+        }
+
+        .globe::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="%2300cec9" stroke-width="0.5" opacity="0.3"><path d="M50 0 V100 M0 50 H100 M15 15 L85 85 M85 15 L15 85 M50 15 A35 35 0 0 1 50 85 A35 35 0 0 1 50 15 M15 50 A35 35 0 0 1 85 50 A35 35 0 0 1 15 50"/></svg>');
+            background-size: cover;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        .connection-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .connection-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            filter: drop-shadow(0 0 5px var(--secondary));
+        }
+
+        .connection-line {
+            position: absolute;
+            background: linear-gradient(to right, var(--secondary), transparent);
+            height: 1px;
+            transform-origin: left center;
+            animation: pulseLine 3s infinite ease-in-out;
+        }
+
+        .floating-users {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .floating-user {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--darker);
+            border: 2px solid var(--primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--light);
+            font-weight: bold;
+            animation: floatUser 15s infinite ease-in-out;
+        }
+
+        .floating-user img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Right Side - Form */
+        .signup-right {
+            width: 500px;
+            background-color: var(--darker);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 4rem;
+            position: relative;
+            z-index: 2;
+            border-left: 1px solid rgba(128, 142, 155, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .signup-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .signup-header p {
+            color: var(--gray);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border-radius: 8px;
+            background-color: rgba(128, 142, 155, 0.1);
+            border: 1px solid rgba(128, 142, 155, 0.2);
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+            outline: none;
+        }
+
+        .password-strength {
+            height: 4px;
+            background-color: rgba(128, 142, 155, 0.2);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--danger);
+            transition: all 0.3s ease;
+        }
+
+        .password-hint {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+        }
+
+        .terms-agreement {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .terms-agreement input {
+            margin-top: 0.2rem;
+            accent-color: var(--primary);
+        }
+
+        .terms-agreement label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .terms-agreement a {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .terms-agreement a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-google {
+            background-color: rgba(128, 142, 155, 0.1);
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(128, 142, 155, 0.2);
+        }
+
+        .btn-google:hover {
+            background-color: rgba(128, 142, 155, 0.2);
+            border-color: var(--gray);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--gray);
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(128, 142, 155, 0.2);
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
+
+        .signin-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray);
+        }
+
+        .signin-link a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .signin-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Background Elements */
+        .bg-circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(108, 92, 231, 0.05);
+            filter: blur(40px);
+        }
+
+        .circle-1 {
+            width: 600px;
+            height: 600px;
+            top: -150px;
+            right: -150px;
+            animation: pulse 8s infinite alternate;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            left: -100px;
+            background: rgba(0, 206, 201, 0.05);
+            animation: pulse 6s infinite alternate-reverse;
+        }
+
+        /* Animations */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes pulseLine {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes floatUser {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(0) translateX(20px);
+            }
+            75% {
+                transform: translateY(20px) translateX(10px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .signup-left {
+                display: none;
+            }
+
+            .signup-right {
+                width: 100%;
+                max-width: 500px;
+                margin: 0 auto;
+                border-left: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .signup-right {
+                padding: 0 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Side - Globe Animation -->
+    <div class="signup-left">
+        <div class="bg-circles">
+            <div class="bg-circle circle-1"></div>
+            <div class="bg-circle circle-2"></div>
+        </div>
+        
+        <div class="globe-container">
+            <div class="globe"></div>
+            
+            <div class="connection-dots" id="connectionDots"></div>
+            <div class="connection-lines" id="connectionLines"></div>
+            <div class="floating-users" id="floatingUsers"></div>
+        </div>
+    </div>
+
+    <!-- Right Side - Form -->
+    <div class="signup-right">
+        <div class="logo">
+            <i class="fas fa-comment-dots"></i>
+            <h1>ChatForAll</h1>
+        </div>
+        
+        <div class="signup-header">
+            <h2>Join Our Community</h2>
+            <p>Connect with people around the world</p>
+        </div>
+        
+        <form method="POST" action="/user/signup">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" class="form-control" placeholder="Enter your full name" name="fullName">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-at input-icon"></i>
+                    <input type="text" class="form-control" placeholder="Choose a username" name = "username">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" class="form-control" placeholder="Enter your email" name="email">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" class="form-control" id="password" placeholder="Create a password" name="password">
+                </div>
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="passwordStrength"></div>
+                </div>
+                <div class="password-hint">
+                    Use 8+ characters with a mix of letters, numbers & symbols
+                </div>
+            </div>
+            
+            <div class="terms-agreement">
+                <input type="checkbox" id="terms">
+                <label for="terms">
+                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Account</button>
+    
+            <div class="signin-link">
+                Already have an account? <a href="/user/signin">Sign in</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create connection dots on the globe
+            const connectionDots = document.getElementById('connectionDots');
+            const connectionLines = document.getElementById('connectionLines');
+            const floatingUsers = document.getElementById('floatingUsers');
+            
+            // Create 20 connection dots
+            for (let i = 0; i < 20; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('connection-dot');
+                
+                // Position on sphere surface
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                const x = 200 * Math.sin(phi) * Math.cos(theta);
+                const y = 200 * Math.sin(phi) * Math.sin(theta);
+                const z = 200 * Math.cos(phi);
+                
+                // Perspective transform
+                const scale = 1 + z / 400;
+                dot.style.transform = `translate(${200 + x}px, ${200 + y}px) scale(${scale})`;
+                dot.style.opacity = scale * 0.8;
+                
+                connectionDots.appendChild(dot);
+                
+                // Create connection lines (randomly)
+                if (Math.random() > 0.7 && i > 0) {
+                    const prevDot = connectionDots.children[Math.floor(Math.random() * i)];
+                    if (prevDot) {
+                        const line = document.createElement('div');
+                        line.classList.add('connection-line');
+                        
+                        const x1 = parseFloat(prevDot.style.transform.split('(')[1].split(',')[0]);
+                        const y1 = parseFloat(prevDot.style.transform.split(',')[1].split(')')[0]);
+                        const x2 = 200 + x;
+                        const y2 = 200 + y;
+                        
+                        const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                        
+                        line.style.width = `${length}px`;
+                        line.style.left = `${x1}px`;
+                        line.style.top = `${y1}px`;
+                        line.style.transform = `rotate(${angle}deg)`;
+                        line.style.opacity = 0.3;
+                        line.style.animationDelay = `${Math.random() * 3}s`;
+                        
+                        connectionLines.appendChild(line);
+                    }
+                }
+            }
+            
+            // Create floating users around the globe
+            const userAvatars = [
+                'https://randomuser.me/api/portraits/women/44.jpg',
+                'https://randomuser.me/api/portraits/men/22.jpg',
+                'https://randomuser.me/api/portraits/women/68.jpg',
+                'https://randomuser.me/api/portraits/men/75.jpg',
+                'https://randomuser.me/api/portraits/women/33.jpg',
+                'https://randomuser.me/api/portraits/men/91.jpg'
+            ];
+            
+            for (let i = 0; i < 12; i++) {
+                const user = document.createElement('div');
+                user.classList.add('floating-user');
+                
+                // Position around the globe
+                const angle = (i / 12) * Math.PI * 2;
+                const distance = 250 + Math.random() * 50;
+                const x = 250 + Math.cos(angle) * distance;
+                const y = 250 + Math.sin(angle) * distance;
+                
+                user.style.left = `${x}px`;
+                user.style.top = `${y}px`;
+                user.style.animationDelay = `${Math.random() * 5}s`;
+                user.style.animationDuration = `${15 + Math.random() * 10}s`;
+                
+                // Add avatar or initials
+                if (Math.random() > 0.5) {
+                    const img = document.createElement('img');
+                    img.src = userAvatars[Math.floor(Math.random() * userAvatars.length)];
+                    user.appendChild(img);
+                } else {
+                    user.textContent = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                }
+                
+                floatingUsers.appendChild(user);
+            }
+            
+            // Password strength indicator
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.getElementById('passwordStrength');
+            
+            passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        
+        // Length check
+        if (password.length > 7) strength += 1;
+        if (password.length > 11) strength += 1;
+        
+        // Character variety checks
+        if (/[A-Z]/.test(password)) strength += 1;
+        if (/[0-9]/.test(password)) strength += 1;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+        
+        // Update strength bar
+        let width = 0;
+        let color = '';
+        
+        if (strength <= 2) {
+            width = 33;
+            color = '#d63031'; // var(--danger)
+        } else if (strength <= 4) {
+            width = 66;
+            color = '#fdcb6e'; // var(--warning)
+        } else {
+            width = 100;
+            color = '#00b894'; // var(--success)
+        }
+        
+        strengthBar.style.width = `${width}%`;
+        strengthBar.style.backgroundColor = color;
+    });
+            
+            // Form submission animation
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                //e.preventDefault();
+                const submitBtn = this.querySelector('.btn-primary');
+                
+                // Loading animation
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account';
+                submitBtn.style.pointerEvents = 'none';
+                
+                // Simulate account creation
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Account Created!';
+                    submitBtn.style.backgroundColor = 'var(--success)';
+                    
+                    // Redirect after delay
+                    //setTimeout(() => {
+                    //    window.location.href = 'chat.html';
+                    //}, 1000);
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

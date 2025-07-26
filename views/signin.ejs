@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatForAll | Sign In</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary: #00cec9;
+            --dark: #1e272e;
+            --darker: #1a2026;
+            --light: #f5f6fa;
+            --gray: #808e9b;
+            --success: #00b894;
+            --danger: #d63031;
+            --base-size: 0.9em; /* Adjusted base size */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            font-size: var(--base-size);
+        }
+
+    
+
+        /* Main container with adjusted height */
+        .main-container {
+            display: flex;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            height: calc(100vh - 54px);
+        }
+
+        /* Left Side - Animation (10% smaller) */
+        .signin-left {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 18px;
+        }
+
+        .floating-phone {
+            width: 288px;
+            height: 585px;
+            background: linear-gradient(145deg, #2d3436, #1e272e);
+            border-radius: 36px;
+            position: relative;
+            box-shadow: 0 27px 54px rgba(0, 0, 0, 0.5),
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        .floating-phone::before {
+            content: '';
+            position: absolute;
+            top: 13.5px;
+            left: 13.5px;
+            right: 13.5px;
+            bottom: 13.5px;
+            border-radius: 31.5px;
+            background: var(--darker);
+            box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .phone-screen {
+            position: absolute;
+            top: 18px;
+            left: 13.5px;
+            right: 13.5px;
+            bottom: 18px;
+            border-radius: 22.5px;
+            background: var(--darker);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 1.35rem;
+            background: url('https://www.transparenttextures.com/patterns/dark-geometric.png');
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.35rem;
+        }
+
+        .chat-header h3 {
+            font-size: 0.9rem;
+            color: var(--light);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 0.9rem;
+        }
+
+        .message {
+            margin-bottom: 0.9rem;
+            max-width: 80%;
+            padding: 0.72rem 0.9rem;
+            border-radius: 13.5px;
+            font-size: 0.81rem;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .message.received {
+            background: rgba(128, 142, 155, 0.1);
+            border-bottom-left-radius: 4.5px;
+            align-self: flex-start;
+        }
+
+        .message.sent {
+            background: var(--primary);
+            border-bottom-right-radius: 4.5px;
+            margin-left: auto;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .typing-dots {
+            display: flex;
+            margin-left: 0.45rem;
+        }
+
+        .typing-dots span {
+            width: 5.4px;
+            height: 5.4px;
+            background: var(--gray);
+            border-radius: 50%;
+            margin: 0 1.8px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .chat-input {
+            display: flex;
+            align-items: center;
+            background: rgba(128, 142, 155, 0.1);
+            border-radius: 18px;
+            padding: 0.45rem 0.9rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--light);
+            padding: 0.45rem;
+            outline: none;
+        }
+
+        /* Background Elements */
+        .bg-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(108, 92, 231, 0.1);
+            filter: blur(54px);
+        }
+
+        .circle-1 {
+            width: 540px;
+            height: 540px;
+            top: -135px;
+            right: -135px;
+            animation: pulse 8s infinite alternate;
+        }
+
+        .circle-2 {
+            width: 360px;
+            height: 360px;
+            bottom: -90px;
+            left: -90px;
+            background: rgba(0, 206, 201, 0.1);
+            animation: pulse 6s infinite alternate-reverse;
+        }
+
+        /* Right Side - Form (10% smaller) */
+        .signin-right {
+            width: 405px;
+            background-color: var(--darker);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 3.6rem;
+            position: relative;
+            z-index: 2;
+            border-left: 1px solid rgba(128, 142, 155, 0.1);
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 1.8rem;
+            justify-content: center;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        .logo i {
+            font-size: 2.25rem;
+            color: var(--primary);
+        }
+
+        .signin-header {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .signin-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.45rem;
+        }
+
+        .signin-header p {
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .form-group {
+            margin-bottom: 1.35rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.45rem;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.72rem 0.9rem 0.72rem 2.7rem;
+            border-radius: 7.2px;
+            background-color: rgba(128, 142, 155, 0.1);
+            border: 1px solid rgba(128, 142, 155, 0.2);
+            color: var(--light);
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2.7px rgba(108, 92, 231, 0.2);
+            outline: none;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.35rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .checkbox-container input {
+            width: 14.4px;
+            height: 14.4px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 0.81rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 7.2px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.9em;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            margin-bottom: 1.35rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1.8px);
+            box-shadow: 0 9px 18px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-google {
+            background-color: rgba(128, 142, 155, 0.1);
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            border: 1px solid rgba(128, 142, 155, 0.2);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.35rem 0;
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(128, 142, 155, 0.2);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 1.35rem;
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        /* Particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float-particle linear infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .floating-phone {
+                width: 252px;
+                height: 522px;
+            }
+            
+            .signin-right {
+                width: 360px;
+                padding: 0 2.7rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .signin-left {
+                display: none;
+            }
+
+            .signin-right {
+                width: 100%;
+                max-width: 450px;
+                margin: 0 auto;
+                border-left: none;
+                padding: 1.8rem;
+            }
+            
+            .main-container {
+                height: auto;
+                min-height: calc(100vh - 54px);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar {
+                height: 48.6px;
+                min-height: 48.6px;
+            }
+            
+            .main-container {
+                height: calc(100vh - 48.6px);
+            }
+            
+            .signin-right {
+                padding: 1.35rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.62rem;
+            }
+            
+            .logo i {
+                font-size: 2.025rem;
+            }
+            
+            .signin-header h2 {
+                font-size: 1.62rem;
+            }
+        }
+
+        /* Animations (unchanged as they're relative) */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotateY(5deg); }
+            50% { transform: translateY(-18px) rotateY(-5deg); }
+        }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4.5px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(9px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+        @keyframes float-particle {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-90px) translateX(45px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left Side - Animation -->
+        <div class="signin-left">
+            <div class="bg-elements">
+                <div class="circle circle-1"></div>
+                <div class="circle circle-2"></div>
+            </div>
+            
+            <div class="floating-phone">
+                <div class="phone-screen">
+                    <div class="chat-header">
+                        <h3>Welcome to ChatForAll</h3>
+                        <i class="fas fa-ellipsis-v" style="color: var(--gray);"></i>
+                    </div>
+                    <div class="chat-messages">
+                        <div class="message received">
+                            Hey there! Ready to join our community?
+                        </div>
+                        <div class="message sent">
+                            Yes! Just need to sign in first.
+                        </div>
+                        <div class="message received">
+                            You'll love it here. We have users from all over the world!
+                        </div>
+                        <div class="typing-indicator">
+                            <small>ChatForAll is typing</small>
+                            <div class="typing-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Type a message...">
+                        <button><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Floating Particles -->
+            <div class="particles" id="particles"></div>
+        </div>
+
+        <!-- Right Side - Form -->
+        <div class="signin-right">
+            <div class="logo">
+                <i class="fas fa-comment-dots"></i>
+                <h1>ChatForAll</h1>
+            </div>
+            
+            <div class="signin-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to continue your global conversations</p>
+            </div>
+            
+            <form method="POST" action="/user/signin">
+                <div class="form-group">
+                    <label class="form-label">Username or Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" class="form-control" placeholder="Enter your username or email" name="username">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" class="form-control" placeholder="Enter your password" name="password">
+                    </div>
+                </div>
+                
+                <div class="remember-forgot">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Sign In</button>
+                
+                <div class="divider">or</div>
+                
+                <button type="button" class="btn btn-google">
+                    <i class="fab fa-google"></i>
+                    Sign in with Google
+                </button>
+                
+                <div class="signup-link">
+                    Don't have an account? <a href="/user/signup">Sign up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create floating particles
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 27; // Reduced from 30
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 1.8px and 5.4px
+                const size = Math.random() * 3.6 + 1.8;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation duration between 9s and 18s
+                const duration = Math.random() * 9 + 9;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Random delay
+                particle.style.animationDelay = `${Math.random() * 4.5}s`;
+                
+                // Random color (primary or secondary)
+                particle.style.backgroundColor = Math.random() > 0.5 ? 'var(--primary)' : 'var(--secondary)';
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Animate messages in the phone mockup
+            const messages = document.querySelectorAll('.message');
+            const typingIndicator = document.querySelector('.typing-indicator');
+            
+            // Animate messages with delays
+            messages.forEach((msg, index) => {
+                msg.style.animationDelay = `${index * 0.45}s`;
+            });
+            
+            // Show typing indicator after last message
+            setTimeout(() => {
+                typingIndicator.style.display = 'flex';
+            }, 2250);
+            
+            // Form submission animation
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('.btn-primary');
+                
+                // Loading animation
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In';
+                submitBtn.style.pointerEvents = 'none';
+                
+                // Simulate sign in process
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Success!';
+                    submitBtn.style.backgroundColor = 'var(--success)';
+                }, 1800);
+            });
+        });
+    </script>
+</body>
+</html>

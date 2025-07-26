@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatForAll | Messages</title>
+    <link rel="stylesheet" href="/css/NavStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary: #00cec9;
+            --dark: #1e272e;
+            --darker: #1a2026;
+            --light: #f5f6fa;
+            --gray: #808e9b;
+            --success: #00b894;
+            --danger: #d63031;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            background-color: var(--darker);
+            border-right: 1px solid rgba(128, 142, 155, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(128, 142, 155, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        .sidebar-header .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            transform: scale(1.1);
+        }
+
+        .user-profile img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-profile .status {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success);
+            border: 2px solid var(--darker);
+            bottom: 0;
+            right: 0;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 1rem;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border-radius: 20px;
+            background-color: rgba(128, 142, 155, 0.1);
+            border: none;
+            color: var(--light);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            background-color: rgba(128, 142, 155, 0.2);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Friends List */
+        .friends-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+
+        .friend {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .friend:hover {
+            background-color: rgba(108, 92, 231, 0.1);
+        }
+
+        .friend.active {
+            background-color: rgba(108, 92, 231, 0.2);
+            border-left: 3px solid var(--primary);
+        }
+
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .friend-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .friend:hover .friend-avatar img {
+            transform: scale(1.05);
+        }
+
+        .friend-status {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid var(--darker);
+            bottom: 2px;
+            right: 2px;
+        }
+
+        .status-online {
+            background-color: var(--success);
+        }
+
+        .status-offline {
+            background-color: var(--gray);
+        }
+
+        .status-away {
+            background-color: #fdcb6e;
+        }
+
+        .friend-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .friend-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .friend-last-msg {
+            font-size: 0.8rem;
+            color: var(--gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .friend-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-left: 1rem;
+        }
+
+        .last-msg-time {
+            font-size: 0.7rem;
+            color: var(--gray);
+            margin-bottom: 0.3rem;
+        }
+
+        .unread-count {
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(128, 142, 155, 0.1);
+            background-color: var(--darker);
+            z-index: 5;
+        }
+
+        .chat-header-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            position: relative;
+        }
+
+        .chat-header-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chat-header-info {
+            flex: 1;
+        }
+
+        .chat-header-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header-status {
+            font-size: 0.8rem;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(128, 142, 155, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-btn:hover {
+            background-color: rgba(108, 92, 231, 0.2);
+            transform: scale(1.1);
+        }
+
+        .chat-header-btn i {
+            color: var(--light);
+            font-size: 1.1rem;
+        }
+
+        /* Messages Container */
+        .messages-container {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: url('https://www.transparenttextures.com/patterns/dark-geometric.png');
+            background-color: var(--dark);
+        }
+
+        .message-date {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .message-date span {
+            background-color: rgba(128, 142, 155, 0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--gray);
+            position: relative;
+            z-index: 1;
+        }
+
+        .message-date::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: rgba(128, 142, 155, 0.1);
+            z-index: 0;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.received .message-content {
+            align-items: flex-start;
+        }
+
+        .message.sent .message-content {
+            align-items: flex-end;
+        }
+
+        .message-bubble {
+            padding: 0.8rem 1.2rem;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.received .message-bubble {
+            background-color: rgba(128, 142, 155, 0.1);
+            border-bottom-left-radius: 5px;
+            margin-left: 10px;
+        }
+
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-bottom-right-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+        }
+
+        .message.sent .message-time {
+            text-align: right;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            align-self: flex-end;
+            margin-right: 0.5rem;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Message Input */
+        .message-input-container {
+            padding: 1.5rem;
+            background-color: var(--darker);
+            border-top: 1px solid rgba(128, 142, 155, 0.1);
+        }
+
+        .message-input-box {
+            display: flex;
+            align-items: center;
+            background-color: rgba(128, 142, 155, 0.1);
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .message-input-box:focus-within {
+            background-color: rgba(128, 142, 155, 0.2);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
+        }
+
+        .message-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--light);
+            padding: 0.8rem;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .message-input-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .message-input-btn:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .message-input-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .message-input-action {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--gray);
+        }
+
+        .message-input-action:hover {
+            background-color: rgba(108, 92, 231, 0.2);
+            color: var(--light);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .typing-dots {
+            display: flex;
+            margin-left: 0.5rem;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--gray);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(128, 142, 155, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .chat-area {
+                width: 100%;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+        }
+        .header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.header-icon:hover {
+    background-color: rgba(108, 92, 231, 0.2);
+    color: var(--light);
+    transform: scale(1.1);
+}
+
+/* Specific icon colors on hover */
+.header-icon:nth-child(1):hover { /* Logout */
+    color: var(--danger);
+}
+
+.header-icon:nth-child(2):hover { /* Settings */
+    color: var(--secondary);
+}
+
+.header-icon:nth-child(3):hover { /* Friends */
+    color: var(--primary);
+}
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>ChatForAll</h2>
+            <a href="/user/logout" class="header-icon" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+            </a>
+            <a href="/settings" class="header-icon" title="Settings">
+                    <i class="fas fa-cog"></i>
+            </a>
+            <a href="/network" class="header-icon" title="Friend Requests">
+                    <i class="fas fa-user-friends"></i>
+            </a>
+        </div>
+
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-bar" placeholder="Search friends...">
+        </div>
+
+        <div class="friends-list" id="friendsList">
+            <!-- Friends will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+        <!-- Chat Header -->
+        <div class="chat-header" id="chatHeader">
+            <div class="chat-header-avatar">
+                <img id="currentFriendAvatar" src="" alt="Friend">
+            </div>
+            <div class="chat-header-info">
+                <div class="chat-header-name" id="currentFriendName">
+                    Select a friend to chat
+                </div>
+                <div class="chat-header-status" id="currentFriendStatus">
+                    <span>Offline</span>
+                </div>
+            </div>
+            <div class="chat-header-actions">
+                <div class="chat-header-btn">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <div class="chat-header-btn">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="chat-header-btn">
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="message-date">
+                <span>Select a friend to view messages</span>
+            </div>
+        </div>
+
+        <!-- Message Input -->
+        <div class="message-input-container">
+            <div class="message-input-box">
+                <div class="message-input-actions">
+                    <div class="message-input-action">
+                        <i class="far fa-smile"></i>
+                    </div>
+                    <div class="message-input-action">
+                        <i class="fas fa-paperclip"></i>
+                    </div>
+                </div>
+                <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." disabled>
+                <button class="message-input-btn" id="sendButton" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current user data (would come from backend in real app)
+        const currentUser = {
+            id: 'user123',
+            username: 'You',
+            avatar: 'https://randomuser.me/api/portraits/men/1.jpg'
+        };
+
+        // Sample friends data (would come from backend API)
+        const friendsData = [
+            {
+                id: 'friend1',
+                username: 'Sarah Johnson',
+                avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+                status: 'online',
+                lastMessage: 'Hey, how are you doing today?',
+                lastMessageTime: '2:30 PM',
+                unreadCount: 3,
+                chat: [
+                    { sender: 'friend1', message: 'Hey there! How are you?', time: '2:15 PM' },
+                    { sender: 'user123', message: "I'm good, thanks! How about you?", time: '2:16 PM' },
+                    { sender: 'friend1', message: "Doing well! Let's meet soon", time: '2:18 PM' }
+                ]
+            },
+            {
+                id: 'friend2',
+                username: 'Mike Chen',
+                avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
+                status: 'online',
+                lastMessage: 'Let\'s meet tomorrow for coffee',
+                lastMessageTime: '1:45 PM',
+                unreadCount: 0,
+                chat: [
+                    { sender: 'user123', message: 'Hey Mike!', time: '1:30 PM' },
+                    { sender: 'friend2', message: 'Hi there!', time: '1:32 PM' },
+                    { sender: 'friend2', message: 'Let\'s meet tomorrow for coffee', time: '1:45 PM' }
+                ]
+            },
+            {
+                id: 'friend3',
+                username: 'Emma Wilson',
+                avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
+                status: 'away',
+                lastMessage: 'I\'ll send you the files soon',
+                lastMessageTime: 'Yesterday',
+                unreadCount: 0,
+                chat: [
+                    { sender: 'friend3', message: 'Working on the project', time: 'Yesterday' },
+                    { sender: 'user123', message: 'Great! How is it going?', time: 'Yesterday' },
+                    { sender: 'friend3', message: 'I\'ll send you the files soon', time: 'Yesterday' }
+                ]
+            }
+        ];
+
+        // DOM Elements
+        const friendsList = document.getElementById('friendsList');
+        const chatHeader = document.getElementById('chatHeader');
+        const currentFriendName = document.getElementById('currentFriendName');
+        const currentFriendAvatar = document.getElementById('currentFriendAvatar');
+        const currentFriendStatus = document.getElementById('currentFriendStatus');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // Current selected friend
+        let selectedFriend = null;
+
+        // Initialize the app
+        function initApp() {
+            renderFriendsList();
+            setupEventListeners();
+        }
+
+        // Render friends list
+        function renderFriendsList() {
+            friendsList.innerHTML = '';
+            
+            friendsData.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend';
+                friendElement.dataset.friendId = friend.id;
+                
+                // Set status class
+                let statusClass = '';
+                if (friend.status === 'online') statusClass = 'status-online';
+                else if (friend.status === 'away') statusClass = 'status-away';
+                else statusClass = 'status-offline';
+                
+                friendElement.innerHTML = `
+                    <div class="friend-avatar">
+                        <img src="${friend.avatar}" alt="${friend.username}">
+                        <div class="friend-status ${statusClass}"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.username}</div>
+                        <div class="friend-last-msg">${friend.lastMessage}</div>
+                    </div>
+                    <div class="friend-meta">
+                        <div class="last-msg-time">${friend.lastMessageTime}</div>
+                        ${friend.unreadCount > 0 ? `<div class="unread-count">${friend.unreadCount}</div>` : ''}
+                    </div>
+                `;
+                
+                friendsList.appendChild(friendElement);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Friend selection
+            friendsList.addEventListener('click', (e) => {
+                const friendElement = e.target.closest('.friend');
+                if (friendElement) {
+                    const friendId = friendElement.dataset.friendId;
+                    selectFriend(friendId);
+                }
+            });
+            
+            // Message sending
+            sendButton.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+
+        // Select a friend to chat with
+        function selectFriend(friendId) {
+            // Remove active class from all friends
+            document.querySelectorAll('.friend').forEach(f => {
+                f.classList.remove('active');
+            });
+            
+            // Find the selected friend
+            selectedFriend = friendsData.find(f => f.id === friendId);
+            if (!selectedFriend) return;
+            
+            // Add active class to selected friend
+            document.querySelector(`.friend[data-friend-id="${friendId}"]`).classList.add('active');
+            
+            // Update chat header
+            currentFriendName.textContent = selectedFriend.username;
+            currentFriendAvatar.src = selectedFriend.avatar;
+            
+            // Update status
+            let statusText = '';
+            let statusColor = '';
+            if (selectedFriend.status === 'online') {
+                statusText = 'Online';
+                statusColor = 'var(--success)';
+            } else if (selectedFriend.status === 'away') {
+                statusText = 'Away';
+                statusColor = '#fdcb6e';
+            } else {
+                statusText = 'Offline';
+                statusColor = 'var(--gray)';
+            }
+            
+            currentFriendStatus.innerHTML = `
+                <i class="fas fa-circle" style="color: ${statusColor}; font-size: 0.6rem; margin-right: 0.3rem;"></i>
+                ${statusText}
+            `;
+            
+            // Load messages
+            loadMessages(selectedFriend.chat);
+            
+            // Enable input
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+            messageInput.focus();
+        }
+
+        // Load messages for selected friend
+        function loadMessages(messages) {
+            messagesContainer.innerHTML = '';
+            
+            if (!messages || messages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="message-date">
+                        <span>No messages yet</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group messages by date (simplified for demo)
+            messagesContainer.innerHTML = `
+                <div class="message-date">
+                    <span>Today</span>
+                </div>
+            `;
+            
+            // Render each message
+            messages.forEach(msg => {
+                const isCurrentUser = msg.sender === currentUser.id;
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
+                
+                if (!isCurrentUser) {
+                    messageElement.innerHTML = `
+                        <div class="message-avatar">
+                            <img src="${selectedFriend.avatar}" alt="${selectedFriend.username}">
+                        </div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                ${msg.message}
+                            </div>
+                            <div class="message-time">${msg.time}</div>
+                        </div>
+                    `;
+                } else {
+                    messageElement.innerHTML = `
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                ${msg.message}
+                            </div>
+                            <div class="message-time">${msg.time}</div>
+                        </div>
+                    `;
+                }
+                
+                messagesContainer.appendChild(messageElement);
+            });
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Send a new message
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (!messageText || !selectedFriend) return;
+            
+            // Create new message object
+            const newMessage = {
+                sender: currentUser.id,
+                message: messageText,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            
+            // Add to friend's chat (in a real app, this would be sent to the server)
+            selectedFriend.chat.push(newMessage);
+            
+            // Update last message in friends list
+            selectedFriend.lastMessage = messageText;
+            selectedFriend.lastMessageTime = 'Just now';
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Re-render messages
+            loadMessages(selectedFriend.chat);
+            
+            // Simulate reply after a delay
+            simulateReply();
+        }
+
+        // Simulate friend reply (for demo purposes)
+        function simulateReply() {
+            if (!selectedFriend) return;
+            
+            setTimeout(() => {
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = `
+                    <small>${selectedFriend.username} is typing</small>
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                messagesContainer.appendChild(typingIndicator);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // After a delay, send the reply
+                setTimeout(() => {
+                    // Remove typing indicator
+                    typingIndicator.remove();
+                    
+                    // Create reply message
+                    const replyMessage = {
+                        sender: selectedFriend.id,
+                        message: getRandomReply(),
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    };
+                    
+                    // Add to chat
+                    selectedFriend.chat.push(replyMessage);
+                    
+                    // Update last message
+                    selectedFriend.lastMessage = replyMessage.message;
+                    selectedFriend.lastMessageTime = 'Just now';
+                    
+                    // Re-render messages
+                    loadMessages(selectedFriend.chat);
+                    
+                    // Re-render friends list to update last message
+                    renderFriendsList();
+                    document.querySelector(`.friend[data-friend-id="${selectedFriend.id}"]`).classList.add('active');
+                    
+                }, 1500 + Math.random() * 2000); // Random delay between 1.5-3.5s
+                
+            }, 500 + Math.random() * 1000); // Random delay before typing starts
+        }
+
+        // Helper function to generate random replies
+        function getRandomReply() {
+            const replies = [
+                "That's interesting!",
+                "I'll think about it",
+                "Sounds good to me!",
+                "Let's discuss this later",
+                "Thanks for letting me know",
+                "I appreciate that",
+                "Can we talk about this tomorrow?",
+                "I'm busy right now, talk later?",
+                "Great idea!",
+                "I'm not sure about that"
+            ];
+            return replies[Math.floor(Math.random() * replies.length)];
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatForAll - Global Chat Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/NavStyle.css">
+
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary: #00cec9;
+            --dark: #1e272e;
+            --darker: #1a2026;
+            --light: #f5f6fa;
+            --gray: #808e9b;
+            --success: #00b894;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+
+        
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            min-height: 100vh;
+            padding: 0 5%;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            flex: 1;
+            z-index: 2;
+        }
+
+        .hero-content h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-content h2 span {
+            color: var(--secondary);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .btn-lg {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .hero-image {
+            flex: 1;
+            position: relative;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background: linear-gradient(145deg, #2d3436, #1e272e);
+            border-radius: 40px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .phone-mockup::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border-radius: 30px;
+            background: var(--darker);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .phone-screen {
+            position: absolute;
+            top: 20px;
+            left: 15px;
+            right: 15px;
+            bottom: 20px;
+            border-radius: 25px;
+            background: var(--darker);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chat-header h3 {
+            font-size: 1rem;
+            color: var(--light);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+            padding: 0.8rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .message.received {
+            background: rgba(128, 142, 155, 0.1);
+            border-bottom-left-radius: 5px;
+            align-self: flex-start;
+        }
+
+        .message.sent {
+            background: var(--primary);
+            border-bottom-right-radius: 5px;
+            margin-left: auto;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+            opacity: 0.7;
+        }
+
+        .typing-dots {
+            display: flex;
+            margin-left: 0.5rem;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--gray);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .chat-input {
+            display: flex;
+            align-items: center;
+            background: rgba(128, 142, 155, 0.1);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--light);
+            padding: 0.5rem;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: transparent;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Background Elements */
+        .bg-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(108, 92, 231, 0.1);
+            filter: blur(60px);
+        }
+
+        .circle-1 {
+            width: 500px;
+            height: 500px;
+            top: -100px;
+            right: -100px;
+            animation: pulse 8s infinite alternate;
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            left: -50px;
+            background: rgba(0, 206, 201, 0.1);
+            animation: pulse 6s infinite alternate-reverse;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 8rem 5%;
+            background: var(--darker);
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(128, 142, 155, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(128, 142, 155, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(108, 92, 231, 0.05);
+            border-color: rgba(108, 92, 231, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotateY(5deg);
+            }
+            50% {
+                transform: translateY(-20px) rotateY(-5deg);
+            }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                padding-top: 100px;
+                text-align: center;
+            }
+
+            .hero-content {
+                margin-bottom: 3rem;
+            }
+
+            .hero-content h2 {
+                font-size: 2.5rem;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+            }
+
+            .phone-mockup {
+                width: 250px;
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content h2 {
+                font-size: 2rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navBar') %>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="bg-elements">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+        </div>
+        <div class="hero-content">
+            <h2>Connect with the <span>World</span> in Real-Time</h2>
+            <p>ChatForAll brings people together from every corner of the globe. Register now and start building friendships that transcend borders with our seamless, secure, and stunning chat platform.</p>
+            <div class="cta-buttons">
+                <a href="/user/signup" class="btn btn-primary btn-lg" style="text-decoration: none;">Get Started</a>
+
+                <button class="btn btn-outline btn-lg">Learn More</button>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="chat-header">
+                        <h3>Global Chat</h3>
+                        <i class="fas fa-ellipsis-v" style="color: var(--gray);"></i>
+                    </div>
+                    <div class="chat-messages">
+                        <div class="message received">
+                            Hey there! How are you doing today?
+                        </div>
+                        <div class="message sent">
+                            I'm great! Just exploring this awesome chat app.
+                        </div>
+                        <div class="message received">
+                            It's really cool, right? I'm from Tokyo btw!
+                        </div>
+                        <div class="typing-indicator">
+                            <small>Maria is typing</small>
+                            <div class="typing-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Type a message...">
+                        <button><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="section-header">
+            <h2>Why Choose ChatForAll?</h2>
+            <p>Our platform offers everything you need for seamless global communication</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3>Global Reach</h3>
+                <p>Connect with users from every country in the world. Break down geographical barriers and make friends across continents.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Experience real-time messaging with our optimized servers ensuring instant delivery of your messages anywhere on Earth.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>End-to-End Encryption</h3>
+                <p>Your conversations are private and secure with military-grade encryption protecting every message you send.</p>
+            </div>
+            <!-- <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-language"></i>
+                </div>
+                <h3>Multi-Language</h3>
+                <p>Built-in translation for over 100 languages means you'll never lose meaning in translation.</p>
+            </div> -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-customize"></i>
+                </div>
+                <h3>Fully Customizable</h3>
+                <p>Personalize your chat experience with themes, fonts, and layouts that match your style.</p>
+            </div>
+            <!-- <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Cross-Platform</h3>
+                <p>Seamlessly switch between devices with our apps for web, desktop, and mobile.</p> -->
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Animate messages in the phone mockup
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.message');
+            const typingIndicator = document.querySelector('.typing-indicator');
+            
+            // Animate messages with delays
+            messages.forEach((msg, index) => {
+                msg.style.animationDelay = `${index * 0.5}s`;
+            });
+            
+            // Show typing indicator after last message
+            setTimeout(() => {
+                typingIndicator.style.display = 'flex';
+            }, 2500);
+            
+            // Add hover effect to feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    const icon = card.querySelector('.feature-icon i');
+                    icon.style.transform = 'scale(1.2)';
+                    icon.style.transition = 'transform 0.3s ease';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    const icon = card.querySelector('.feature-icon i');
+                    icon.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

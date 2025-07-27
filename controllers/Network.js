@@ -1,6 +1,6 @@
 const User = require('../models/User');
-const room = require('../models/ChatRoom');
-// Get complete friend data
+const ChatRoom = require('../models/ChatRoom');
+
 exports.getFriendData = async (req, res) => {
     try {
         const user = await User.findById(req.user.userid)
@@ -19,7 +19,6 @@ exports.getFriendData = async (req, res) => {
     }
 };
 
-// Search users with better query handling
 exports.searchUsers = async (req, res) => {
     try {
         const keyword = req.query.q;
@@ -28,7 +27,6 @@ exports.searchUsers = async (req, res) => {
             return res.status(200).json([]);
         }
 
-        // Get current user's network to exclude from search
         const currentUser = await User.findById(req.user.userid);
         const excludedIds = [
             req.user.userid,
@@ -52,7 +50,6 @@ exports.searchUsers = async (req, res) => {
     }
 };
 
-// Enhanced friend request sending
 exports.sendFriendRequest = async (req, res) => {
     try {
         const targetUserId = req.body.userId;
@@ -68,7 +65,6 @@ exports.sendFriendRequest = async (req, res) => {
 
         if (!targetUser) return res.status(404).json({ message: 'User not found' });
 
-        // Check existing relationships
         if (currentUser.friends.includes(targetUserId)) {
             return res.status(400).json({ message: 'Already friends with this user' });
         }
@@ -81,7 +77,6 @@ exports.sendFriendRequest = async (req, res) => {
             return res.status(400).json({ message: 'This user has already sent you a request' });
         }
 
-        // Add to sent and pending requests
         currentUser.sentRequests.push(targetUserId);
         targetUser.pendingRequests.push(req.user.userid);
 
@@ -102,7 +97,6 @@ exports.sendFriendRequest = async (req, res) => {
     }
 };
 
-// Improved friend request acceptance
 exports.acceptFriendRequest = async (req, res) => {
     try {
         const requesterId = req.body.userId;
@@ -113,12 +107,10 @@ exports.acceptFriendRequest = async (req, res) => {
 
         if (!requester) return res.status(404).json({ message: 'User not found' });
 
-        // Verify request exists
         if (!user.pendingRequests.includes(requesterId)) {
             return res.status(400).json({ message: 'No pending request from this user' });
         }
 
-        // Update relationships
         user.pendingRequests = user.pendingRequests.filter(id => id.toString() !== requesterId);
         requester.sentRequests = requester.sentRequests.filter(id => id.toString() !== req.user.userid);
         
@@ -137,7 +129,6 @@ exports.acceptFriendRequest = async (req, res) => {
         const roomName = `${usernames[0]}-${usernames[1]}`;
 
         const existingRoom = await ChatRoom.findOne({ roomName });
-
         if (!existingRoom) {
             await ChatRoom.create({
                 roomName,
@@ -160,7 +151,6 @@ exports.acceptFriendRequest = async (req, res) => {
     }
 };
 
-// New decline request function
 exports.declineFriendRequest = async (req, res) => {
     try {
         const requesterId = req.body.userId;
@@ -195,7 +185,6 @@ exports.declineFriendRequest = async (req, res) => {
     }
 };
 
-// Enhanced friend removal
 exports.removeFriend = async (req, res) => {
     try {
         const friendId = req.body.userId;
@@ -206,11 +195,9 @@ exports.removeFriend = async (req, res) => {
 
         if (!friend) return res.status(404).json({ message: 'User not found' });
 
-        // Remove from friends lists
         user.friends = user.friends.filter(id => id.toString() !== friendId);
         friend.friends = friend.friends.filter(id => id.toString() !== req.user.userid);
 
-        // Also remove any pending/sent requests if they exist
         user.pendingRequests = user.pendingRequests.filter(id => id.toString() !== friendId);
         user.sentRequests = user.sentRequests.filter(id => id.toString() !== friendId);
         friend.pendingRequests = friend.pendingRequests.filter(id => id.toString() !== req.user.userid);

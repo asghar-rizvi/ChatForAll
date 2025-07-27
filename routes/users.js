@@ -11,8 +11,6 @@ route.get('/signup', async(req, res) => {
     return res.render('signup');
 })
 
-route.get('/logout', handleLogout)
-
 route.post('/signup', handleUserSignUp);
 route.post('/signin', handleUserSignIn);
 

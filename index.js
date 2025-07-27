@@ -1,34 +1,31 @@
+require('dotenv').config();
 const express = require('express');
 const cookiee_parser = require('cookie-parser');
 
 const app = express();
-PORT = 3000;
+const PORT = process.env.PORT || 8000;
+const DB_URL = process.env.DB_URL
+
+
+// Socket Connection Setup
 const http = require('http');
-const server = http.createServer(app);
+const socketio = require('socket.io');
+const initSocketIO = require('./service/socket');
 
-
-const { Server } = require('socket.io');
-const io = new Server(server); 
-io.on('connection', (socket) => {
-    console.log('user connected');
+const server = http.createServer(app); 
+const io = socketio(server, {
+  cors: {
+    origin: '*', 
+    methods: ['GET', 'POST']
+  }
 });
+
+initSocketIO(io); 
 
 
 // DB Connection
 const connectToDB = require('./DBConnection');
-connectToDB('mongodb://127.0.0.1:27017/chat-APP');
-
-
-// Socket Connection
-
-
-
-
-
-
-
-
-
+connectToDB(DB_URL);
 
 
 // Middle wares
@@ -52,6 +49,11 @@ const routerChat = require('./routes/Chatroutes');
 app.use('/user', routerUser);
 app.use('/network',checkAuthentication, routerNetwork);
 app.use('/chat',checkAuthentication, routerChat);
+
+
+const { handleLogout } = require('./controllers/Chat')
+app.get('/logout', checkAuthentication ,handleLogout);
+
 
 
 

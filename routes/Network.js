@@ -1,9 +1,8 @@
-const express = require('express');
-const router = express.Router();
+const { Router } = require('express');
+const router = Router();
 const networkController = require('../controllers/Network');
 const User = require('../models/User');
 
-// Network UI
 router.get('/', async (req, res) => {
     try {
         const user = await User.findById(req.user.userid)

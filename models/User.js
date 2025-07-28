@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  fullName : {
+  fullName: {
     type: String,
     required: true
   },
@@ -20,6 +20,9 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  passwordUpdatedAt: {
+    type: Date
   },
   friends: [
     {
@@ -43,9 +46,17 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  socketId: {
+  location: {
     type: String,
     default: null
+  },
+  profileImage: {
+    type: String,
+    default: '/default/default.png' 
+  },
+  bio: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 

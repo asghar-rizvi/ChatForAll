@@ -32,7 +32,7 @@ connectToDB(DB_URL);
 const path = require('path');
 app.use(express.urlencoded({ extended:false }));
 app.use(express.json());
-app.use(express.static(path.resolve('./public')));
+app.use(express.static(path.resolve('public')));
 app.set('view engine', 'ejs')
 app.use(cookiee_parser());
 
@@ -45,16 +45,16 @@ app.get('/', async(req, res) =>{
 const routerUser = require('./routes/users');
 const routerNetwork = require('./routes/Network');
 const routerChat = require('./routes/Chatroutes');
+const routerSettings = require('./routes/settings');
 
 app.use('/user', routerUser);
 app.use('/network',checkAuthentication, routerNetwork);
 app.use('/chat',checkAuthentication, routerChat);
+app.use('/settings',checkAuthentication, routerSettings);
 
 
 const { handleLogout } = require('./controllers/Chat')
 app.get('/logout', checkAuthentication ,handleLogout);
-
-
 
 
 server.listen(PORT, () => {

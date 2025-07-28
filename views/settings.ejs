@@ -137,6 +137,79 @@
             transform: translateY(-2px);
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: var(--darker);
+            border-radius: 10px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        .modal-body .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
         /* Main Container */
         .settings-container {
             padding: 120px 5% 50px;
@@ -692,14 +765,15 @@
             <h1>ChatForAll</h1>
         </div>
         <div class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Chat</a>
-            <a href="#">Network</a>
-            <a href="#" class="active">Settings</a>
+            <a href="/">Home</a>
+            <a href="/chat">Chat</a>
+            <a href="/network">Network</a>
+            <a href="/settings" class="active">Settings</a>
         </div>
         <div class="auth-buttons">
             <div class="user-avatar-mini" style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--primary); display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+        
+                <img src="<%= user.profileImage || '/default/default.png' %>" alt="User" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
             </div>
         </div>
     </nav>
@@ -707,6 +781,36 @@
     <!-- Floating Background Elements -->
     <div class="floating-element floating-element-1"></div>
     <div class="floating-element floating-element-2"></div>
+
+    <!-- Password Update Modal -->
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Update Password</h3>
+                <button class="modal-close" id="closePasswordModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" class="form-control" name="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" name="newPassword" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" name="confirmPassword" required minlength="8">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" id="cancelPasswordUpdate">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Container -->
     <div class="settings-container">
@@ -717,29 +821,13 @@
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </div>
-                <div class="settings-menu-item active">
+                <div class="settings-menu-item active" data-section="profile">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
                 </div>
-                <div class="settings-menu-item">
+                <div class="settings-menu-item" data-section="security">
                     <i class="fas fa-lock"></i>
                     <span>Security</span>
-                </div>
-                <div class="settings-menu-item">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                </div>
-                <div class="settings-menu-item">
-                    <i class="fas fa-palette"></i>
-                    <span>Appearance</span>
-                </div>
-                <div class="settings-menu-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Privacy</span>
-                </div>
-                <div class="settings-menu-item">
-                    <i class="fas fa-user-cog"></i>
-                    <span>Account</span>
                 </div>
             </div>
         </div>
@@ -747,54 +835,59 @@
         <!-- Settings Content -->
         <div class="settings-content">
             <!-- Profile Section -->
-            <div class="settings-header">
-                <h2>Profile Settings</h2>
-                <div class="settings-header-actions">
-                    <button class="btn btn-outline">Cancel</button>
-                    <button class="btn btn-primary">Save Changes</button>
+            <div class="settings-section" id="profile-section">
+                <div class="settings-header">
+                    <h2>Profile Settings</h2>
+                    <div class="settings-header-actions">
+                        <button class="btn btn-outline" id="cancelProfileChanges">Cancel</button>
+                        <button class="btn btn-primary" id="saveProfileChanges">Save Changes</button>
+                    </div>
                 </div>
+
+                <form id="profileForm" enctype="multipart/form-data">
+                    <div class="profile-section">
+                        <div class="avatar-upload">
+                            <img src="<%= user.profileImage || '/public/default/default.jpg' %>" alt="User" class="avatar-preview" id="avatarPreview">
+                            <div class="avatar-upload-btn">
+                                <button class="btn btn-primary" style="width: 100%;">Change Avatar</button>
+                                <input type="file" name="avatar" id="avatarInput" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="profile-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" name="fullName" value="<%= user.fullName %>" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" name="username" value="<%= user.username %>" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" value="<%= user.email %>" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Bio</label>
+                                <textarea class="form-control" name="bio" rows="4"><%= user.bio || '' %></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-control" name="location" value="<%= user.location || '' %>">
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
 
-            <div class="profile-section">
-                <div class="avatar-upload">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="avatar-preview">
-                    <div class="avatar-upload-btn">
-                        <button class="btn btn-primary" style="width: 100%;">Change Avatar</button>
-                        <input type="file" accept="image/*">
-                    </div>
-                </div>
-
-                <div class="profile-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">First Name</label>
-                            <input type="text" class="form-control" value="John">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" class="form-control" value="Doe">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Username</label>
-                        <input type="text" class="form-control" value="johndoe">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Bio</label>
-                        <textarea class="form-control" rows="4">UI/UX Designer & Developer. Creating beautiful digital experiences.</textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Location</label>
-                        <input type="text" class="form-control" value="San Francisco, CA">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Security Section (Hidden by default) -->
-            <div style="display: none;">
+            <!-- Security Section -->
+            <div class="settings-section" id="security-section" style="display: none;">
                 <div class="settings-header">
                     <h2>Security Settings</h2>
                 </div>
@@ -806,215 +899,15 @@
                         </div>
                         <div>
                             <div class="security-title">Password</div>
-                            <div class="security-desc">Last changed 3 months ago</div>
+                            <div class="security-desc">Last changed <%= user.passwordUpdatedAt ? new Date(user.passwordUpdatedAt).toLocaleDateString() : 'never' %></div>
                         </div>
                     </div>
-                    <button class="btn btn-outline">Change</button>
+                    <button class="btn btn-outline" id="changePasswordBtn">Change</button>
                 </div>
 
-                <div class="security-item">
-                    <div class="security-info">
-                        <div class="security-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <div>
-                            <div class="security-title">Two-Factor Authentication</div>
-                            <div class="security-desc">Add an extra layer of security</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary">Enable</button>
-                </div>
 
-                <div class="security-item">
-                    <div class="security-info">
-                        <div class="security-icon">
-                            <i class="fas fa-laptop"></i>
-                        </div>
-                        <div>
-                            <div class="security-title">Active Sessions</div>
-                            <div class="security-desc">3 devices currently active</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-outline">View All</button>
-                </div>
-            </div>
-
-            <!-- Notifications Section (Hidden by default) -->
-            <div style="display: none;">
-                <div class="settings-header">
-                    <h2>Notification Settings</h2>
-                </div>
-
-                <div class="notification-item">
-                    <div class="notification-info">
-                        <div class="notification-title">Message Notifications</div>
-                        <div class="notification-desc">Get notified when you receive new messages</div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="notification-item">
-                    <div class="notification-info">
-                        <div class="notification-title">Friend Requests</div>
-                        <div class="notification-desc">Get notified when someone sends you a friend request</div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="notification-item">
-                    <div class="notification-info">
-                        <div class="notification-title">Connection Activity</div>
-                        <div class="notification-desc">Get notified when your connections post updates</div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="notification-item">
-                    <div class="notification-info">
-                        <div class="notification-title">Email Notifications</div>
-                        <div class="notification-desc">Receive important updates via email</div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Appearance Section (Hidden by default) -->
-            <div style="display: none;">
-                <div class="settings-header">
-                    <h2>Appearance Settings</h2>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Theme</label>
-                    <div class="theme-options">
-                        <div class="theme-option active">
-                            <div class="theme-preview">
-                                <div class="theme-primary"></div>
-                                <div class="theme-secondary"></div>
-                            </div>
-                            <div class="theme-info">Default</div>
-                        </div>
-                        <div class="theme-option">
-                            <div class="theme-preview" style="background: linear-gradient(135deg, #0984e3, #00cec9);"></div>
-                            <div class="theme-info">Ocean</div>
-                        </div>
-                        <div class="theme-option">
-                            <div class="theme-preview" style="background: linear-gradient(135deg, #e84393, #fd79a8);"></div>
-                            <div class="theme-info">Pink</div>
-                        </div>
-                        <div class="theme-option">
-                            <div class="theme-preview" style="background: linear-gradient(135deg, #00b894, #55efc4);"></div>
-                            <div class="theme-info">Emerald</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Dark Mode</label>
-                    <label class="switch" style="display: block; width: 60px;">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Privacy Section (Hidden by default) -->
-            <div style="display: none;">
-                <div class="settings-header">
-                    <h2>Privacy Settings</h2>
-                </div>
-
-                <div class="privacy-item">
-                    <div class="privacy-title">
-                        <i class="fas fa-user-friends"></i>
-                        <span>Who can see your profile?</span>
-                    </div>
-                    <div class="privacy-options">
-                        <div class="privacy-option">
-                            <input type="radio" name="profile_visibility" id="public" checked>
-                            <label for="public">
-                                <div class="privacy-option-title">Public</div>
-                                <div class="privacy-option-desc">Anyone on or off ChatForAll</div>
-                            </label>
-                        </div>
-                        <div class="privacy-option">
-                            <input type="radio" name="profile_visibility" id="connections">
-                            <label for="connections">
-                                <div class="privacy-option-title">Connections Only</div>
-                                <div class="privacy-option-desc">Only your connections</div>
-                            </label>
-                        </div>
-                        <div class="privacy-option">
-                            <input type="radio" name="profile_visibility" id="private">
-                            <label for="private">
-                                <div class="privacy-option-title">Private</div>
-                                <div class="privacy-option-desc">Only you</div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="privacy-item">
-                    <div class="privacy-title">
-                        <i class="fas fa-search"></i>
-                        <span>Search Visibility</span>
-                    </div>
-                    <div class="privacy-options">
-                        <div class="privacy-option">
-                            <input type="radio" name="search_visibility" id="search_public" checked>
-                            <label for="search_public">
-                                <div class="privacy-option-title">Public</div>
-                                <div class="privacy-option-desc">Anyone can find you</div>
-                            </label>
-                        </div>
-                        <div class="privacy-option">
-                            <input type="radio" name="search_visibility" id="search_connections">
-                            <label for="search_connections">
-                                <div class="privacy-option-title">Connections Only</div>
-                                <div class="privacy-option-desc">Only your connections can find you</div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="privacy-item">
-                    <div class="privacy-title">
-                        <i class="fas fa-envelope"></i>
-                        <span>Message Requests</span>
-                    </div>
-                    <div class="privacy-options">
-                        <div class="privacy-option">
-                            <input type="radio" name="message_requests" id="message_everyone" checked>
-                            <label for="message_everyone">
-                                <div class="privacy-option-title">Everyone</div>
-                                <div class="privacy-option-desc">Anyone can message you</div>
-                            </label>
-                        </div>
-                        <div class="privacy-option">
-                            <input type="radio" name="message_requests" id="message_connections">
-                            <label for="message_connections">
-                                <div class="privacy-option-title">Connections Only</div>
-                                <div class="privacy-option-desc">Only your connections can message you</div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Account Section (Hidden by default) -->
-            <div style="display: none;">
+            <!-- Account Section -->
+            <div class="settings-section" id="account-section" style="display: none;">
                 <div class="settings-header">
                     <h2>Account Settings</h2>
                 </div>
@@ -1056,10 +949,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Tab switching functionality
             const menuItems = document.querySelectorAll('.settings-menu-item');
-            const contentSections = document.querySelectorAll('.settings-content > div');
+            const contentSections = document.querySelectorAll('.settings-section');
             
-            menuItems.forEach((item, index) => {
+            menuItems.forEach((item) => {
                 item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section') + '-section';
+                    
                     // Remove active class from all menu items
                     menuItems.forEach(i => i.classList.remove('active'));
                     // Add active class to clicked item
@@ -1068,13 +963,13 @@
                     // Hide all content sections
                     contentSections.forEach(section => section.style.display = 'none');
                     // Show corresponding content section
-                    contentSections[index].style.display = 'block';
+                    document.getElementById(sectionId).style.display = 'block';
                 });
             });
 
             // Avatar upload preview
-            const avatarInput = document.querySelector('.avatar-upload input');
-            const avatarPreview = document.querySelector('.avatar-preview');
+            const avatarInput = document.getElementById('avatarInput');
+            const avatarPreview = document.getElementById('avatarPreview');
             
             avatarInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -1091,46 +986,86 @@
                 }
             });
 
-            // Theme selection
-            const themeOptions = document.querySelectorAll('.theme-option');
-            themeOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    themeOptions.forEach(o => o.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Pulse animation
-                    this.style.animation = 'pulse 0.5s ease';
-                    setTimeout(() => {
-                        this.style.animation = 'none';
-                    }, 500);
-                });
-            });
+        
 
-            // Switch animations
-            const switches = document.querySelectorAll('.switch input');
-            switches.forEach(sw => {
-                sw.addEventListener('change', function() {
-                    const slider = this.nextElementSibling;
-                    slider.style.transform = 'scale(1.1)';
-                    setTimeout(() => {
-                        slider.style.transform = 'scale(1)';
-                    }, 300);
-                });
+            // Password modal functionality
+            const passwordModal = document.getElementById('passwordModal');
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const closePasswordModal = document.getElementById('closePasswordModal');
+            const cancelPasswordUpdate = document.getElementById('cancelPasswordUpdate');
+            
+            changePasswordBtn.addEventListener('click', () => {
+                passwordModal.classList.add('active');
             });
-
-            // Danger button hover effects
-            const dangerButtons = document.querySelectorAll('.account-action.danger');
-            dangerButtons.forEach(button => {
-                button.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                    this.style.boxShadow = '0 10px 20px rgba(214, 48, 49, 0.2)';
-                });
+            
+            closePasswordModal.addEventListener('click', () => {
+                passwordModal.classList.remove('active');
+            });
+            
+            cancelPasswordUpdate.addEventListener('click', () => {
+                passwordModal.classList.remove('active');
+            });
+            
+            // Password form submission
+            const passwordForm = document.getElementById('passwordForm');
+            passwordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
                 
-                button.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(-3px)';
-                    this.style.boxShadow = 'none';
-                });
+                const formData = new FormData(this);
+                const data = {
+                    currentPassword: formData.get('currentPassword'),
+                    newPassword: formData.get('newPassword'),
+                    confirmPassword: formData.get('confirmPassword')
+                };
+                
+                if (data.newPassword !== data.confirmPassword) {
+                    alert('New passwords do not match!');
+                    return;
+                }
+                
+                fetch('/settings/update-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          alert('Password updated successfully!');
+                          passwordModal.classList.remove('active');
+                          passwordForm.reset();
+                      } else {
+                          alert(data.message || 'Failed to update password');
+                      }
+                  });
             });
+
+            // Profile form submission
+            const profileForm = document.getElementById('profileForm');
+            const saveProfileChanges = document.getElementById('saveProfileChanges');
+            
+            saveProfileChanges.addEventListener('click', () => {
+                const formData = new FormData(profileForm);
+                
+                fetch('/settings/update-profile', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          alert('Profile updated successfully!');
+                          if (data.avatarUrl) {
+                              document.getElementById('avatarPreview').src = data.avatarUrl;
+                              // Update nav avatar too
+                              document.querySelector('.user-avatar-mini img').src = data.avatarUrl;
+                          }
+                      } else {
+                          alert(data.message || 'Failed to update profile');
+                      }
+                  });
+            });
+
         });
     </script>
 </body>

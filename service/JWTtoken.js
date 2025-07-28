@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = '$asghar$009911%87'
+const SECRET_KEY = process.env.SECRET_KEY;
 
 function createJWT(user){
     const payload = {
@@ -10,7 +10,9 @@ function createJWT(user){
         sentRequests: user.sentRequests,
         pendingRequests : user.pendingRequests,
         isOnline : user.isOnline,
-        socketId: user.socketId
+        location : user.location,
+        profileImage : user.profileImage,
+        bio : user.bio
     }
 
     return jwt.sign(payload, SECRET_KEY)
